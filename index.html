@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LEGAL PC ASSISTANT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .hidden {
+      display: none;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .login-box, .search-box, .assistant-box {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      margin: 20px;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .upload-label {
+      background: #e6f7ff;
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px dashed #007bff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #loginError {
+      color: red;
+      font-size: 14px;
+    }
+    #resultBox {
+      margin-top: 10px;
+      font-size: 14px;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .or-divider {
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loginPage" class="login-box">
+  <div class="title">LEGAL PC ASSISTANT LOGIN</div>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <div style="text-align: center;">
+    <button onclick="handleLogin()">Login</button>
+  </div>
+  <div id="loginError"></div>
+</div>
+
+<div id="searchPage" class="search-box hidden">
+  <div class="title">Search Patent Act - Section or Keyword</div>
+  <h3>Search by Section</h3>
+  <input type="text" id="sectionInput" placeholder="Enter Section Number (e.g. 2, 25, 48)">
+  <div class="or-divider">OR</div>
+  <h3>Search by Keyword</h3>
+  <input type="text" id="keywordInput" placeholder="Enter Keyword (e.g. invention, grant, secrecy)">
+  <div style="text-align: center;">
+    <button onclick="goToLogin()">Back</button>
+    <button onclick="showSearchResult()">Result</button>
+    <button onclick="goToAssistant()">Next</button>
+  </div>
+  <div id="resultBox"></div>
+</div>
+
+<div id="assistantPage" class="assistant-box hidden">
+  <div class="title">LEGAL PC ASSISTANT</div>
+  <div style="margin-bottom: 10px;">
+    <label for="file-upload" class="upload-label">📎 Upload file/image</label>
+    <input type="file" id="file-upload" multiple style="display:none;">
+  </div>
+  <input type="text" id="chatInput" placeholder="Ask anything here...">
+  <div style="text-align: center;">
+    <button onclick="goToSearch()">Back</button>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  <div id="resultBox"></div>
+</div>
+
+<script>
+  const sections = {
+    1: "Short title, extent and commencement",
+    2: "Definitions",
+    3: "What are not inventions",
+    48: "Rights of patentees",
+    25: "Opposition to grant of patent",
+    35: "Secrecy directions"
+  };
+
+  const faqs = {
+    "what is patent": "A patent is an exclusive legal right granted for an invention, which must be new, useful, and non-obvious.",
+    "who can apply for a patent": "Under Section 6 of the Patent Act, the true and first inventor or an assignee can apply for a patent.",
+    "what is not patentable": "Section 3 of the Patent Act lists inventions that are not patentable, such as abstract ideas or laws of nature.",
+    "what is patent infringement": "Patent infringement is the unauthorized making, using, or selling of a patented invention.",
+    "what are secrecy directions": "Under Section 35, secrecy directions are issued when an invention is relevant for defense purposes."
+  };
+
+  function handleLogin() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const error = document.getElementById('loginError');
+    if (username === 'admin' && password === 'admin123') {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('searchPage').classList.remove('hidden');
+    } else {
+      error.textContent = '❌ Invalid username or password';
+    }
+  }
+
+  function goToLogin() {
+    document.getElementById('searchPage').classList.add('hidden');
+    document.getElementById('loginPage').classList.remove('hidden');
+  }
+
+  function goToSearch() {
+    document.getElementById('assistantPage').classList.add('hidden');
+    document.getElementById('searchPage').classList.remove('hidden');
+  }
+
+  function goToAssistant() {
+    document.getElementById('searchPage').classList.add('hidden');
+    document.getElementById('assistantPage').classList.remove('hidden');
+  }
+
+  function showSearchResult() {
+    const section = document.getElementById('sectionInput').value.trim();
+    const keyword = document.getElementById('keywordInput').value.trim().toLowerCase();
+    const resultBox = document.getElementById('resultBox');
+
+    if (section && keyword) {
+      resultBox.innerHTML = 'Please use only one field: Section OR Keyword.';
+      return;
+    }
+
+    if (section && sections[section]) {
+      resultBox.innerHTML = <strong>Section ${section}:</strong> ${sections[section]};
+    } else if (keyword) {
+      let result = '';
+      for (let key in sections) {
+        if (sections[key].toLowerCase().includes(keyword)) {
+          result += <strong>Section ${key}:</strong> ${sections[key]}<br><br>;
+        }
+      }
+      resultBox.innerHTML = result || 'No results found for keyword.';
+    } else {
+      resultBox.innerHTML = 'Please enter either a section number or a keyword.';
+    }
+  }
+
+  function sendMessage() {
+    const message = document.getElementById('chatInput').value.trim().toLowerCase();
+    const resultBox = document.getElementById('resultBox');
+    if (message) {
+      const answer = faqs[message];
+      resultBox.innerHTML = answer ? <strong>Answer:</strong> ${answer} : 'Sorry, I do not have an answer to that question yet.';
+      document.getElementById('chatInput').value = '';
+    } else {
+      alert("Please enter a message before sending.");
+    }
+  }
+</script>
+
+</body>
+</html>
