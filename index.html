@@ -146,6 +146,7 @@
     if (username === 'admin' && password === 'admin123') {
       document.getElementById('loginPage').classList.add('hidden');
       document.getElementById('searchPage').classList.remove('hidden');
+      error.textContent = '';
     } else {
       error.textContent = '❌ Invalid username or password';
     }
@@ -169,7 +170,7 @@
   function showSearchResult() {
     const section = document.getElementById('sectionInput').value.trim();
     const keyword = document.getElementById('keywordInput').value.trim().toLowerCase();
-    const resultBox = document.getElementById('resultBox');
+    const resultBox = document.getElementById('searchPage').querySelector('#resultBox');
 
     if (section && keyword) {
       resultBox.innerHTML = 'Please use only one field: Section OR Keyword.';
@@ -177,12 +178,12 @@
     }
 
     if (section && sections[section]) {
-      resultBox.innerHTML = <strong>Section ${section}:</strong> ${sections[section]};
+      resultBox.innerHTML = `<strong>Section ${section}:</strong> ${sections[section]}`;
     } else if (keyword) {
       let result = '';
       for (let key in sections) {
         if (sections[key].toLowerCase().includes(keyword)) {
-          result += <strong>Section ${key}:</strong> ${sections[key]}<br><br>;
+          result += `<strong>Section ${key}:</strong> ${sections[key]}<br><br>`;
         }
       }
       resultBox.innerHTML = result || 'No results found for keyword.';
@@ -193,10 +194,10 @@
 
   function sendMessage() {
     const message = document.getElementById('chatInput').value.trim().toLowerCase();
-    const resultBox = document.getElementById('resultBox');
+    const resultBox = document.getElementById('assistantPage').querySelector('#resultBox');
     if (message) {
       const answer = faqs[message];
-      resultBox.innerHTML = answer ? <strong>Answer:</strong> ${answer} : 'Sorry, I do not have an answer to that question yet.';
+      resultBox.innerHTML = answer ? `<strong>Answer:</strong> ${answer}` : 'Sorry, I do not have an answer to that question yet.';
       document.getElementById('chatInput').value = '';
     } else {
       alert("Please enter a message before sending.");
